@@ -53,6 +53,7 @@ def _proto_gen_impl(ctx):
   srcs = ctx.files.srcs
   deps = []
   deps += ctx.files.srcs
+  deps += ctx.files.toolchain_deps
   gen_dir = _GenDir(ctx)
   if gen_dir:
     import_flags = ["-I" + gen_dir, "-I" + ctx.var["GENDIR"] + "/" + gen_dir]
@@ -105,6 +106,7 @@ def _proto_gen_impl(ctx):
 proto_gen = rule(
     attrs = {
         "srcs": attr.label_list(allow_files = True),
+        "toolchain_deps": attr.label_list(allow_files = True),
         "deps": attr.label_list(providers = ["proto"]),
         "includes": attr.string_list(),
         "protoc": attr.label(
@@ -196,6 +198,7 @@ def cc_proto_library(
         name=name + "_genproto",
         srcs=srcs,
         deps=[s + "_genproto" for s in deps],
+        toolchain_deps = ["//tools/defaults:crosstool"],
         includes=includes,
         protoc=protoc,
         visibility=["//visibility:public"],
@@ -218,6 +221,7 @@ def cc_proto_library(
       name=name + "_genproto",
       srcs=srcs,
       deps=[s + "_genproto" for s in deps],
+      toolchain_deps = ["//tools/defaults:crosstool"],
       includes=includes,
       protoc=protoc,
       plugin=grpc_cpp_plugin,
@@ -336,6 +340,7 @@ def py_proto_library(
       name=name + "_genproto",
       srcs=srcs,
       deps=[s + "_genproto" for s in deps],
+      toolchain_deps = ["//tools/defaults:crosstool"],
       includes=includes,
       protoc=protoc,
       gen_py=1,
